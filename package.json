@@ -1,7 +1,7 @@
 {
   "name": "vite-plugin-binary",
   "type": "module",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Vite plugin for importing file in Uint8Array format",
   "author": "Yufan Sheng <syhily@gmail.com>",
   "license": "MIT",
