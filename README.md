@@ -6,7 +6,6 @@ A Vite plugin for importing the file as binary with compress support.
 
 ```bash
 npm i -D vite-plugin-binary
-npm i fflate
 ```
 
 ## Usage
@@ -22,8 +21,35 @@ export default defineConfig({
 })
 ```
 
-```main.ts
-import uint8array from './opposans.ttf?binary'
+```ts
+// main.ts
+import compressed from './opposans.ttf?binary'
+```
+
+### Node.js environment
+
+Given the imports is compressed in gzip format. You can decompress by using the zlib no Node.js environment.
+
+```ts
+import { gunzipSync } from 'node:zlib'
+import compressed from './opposans.ttf?binary'
+
+const uint8Array = gzipSync(compressed)
+```
+
+### Browser environment
+
+Given the imports is compressed in gzip format. You can install `fflate` and other tools.
+
+```sh
+npm i fflate
+```
+
+```ts
+import { gunzipSync } from 'fflate'
+import compressed from './opposans.ttf?binary'
+
+const uint8Array = gzipSync(compressed)
 ```
 
 ## TypeScript support

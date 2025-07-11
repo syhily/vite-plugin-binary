@@ -8,12 +8,11 @@
   </head>
   <body>
     <div id="app"><pre><code id="main-code"></code></pre></div>
-    <script src="https://cdn.jsdelivr.net/npm/buffer@6.0.3/index.min.js"></script>
     <script type="module">
       import buffer from './src/main.ts?binary'
-      import { Buffer } from 'buffer'
+      import { gunzipSync } from 'fflate'
 
-      document.getElementById("main-code").innerText = Buffer.from(buffer).toString('utf8')
+      document.getElementById("main-code").innerText = (new TextDecoder("utf-8")).decode(gunzipSync(buffer))
     </script>
   </body>
 </html>

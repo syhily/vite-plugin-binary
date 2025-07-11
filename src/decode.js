@@ -1,5 +1,3 @@
-import { gunzipSync } from 'fflate'
-
 const z85 = charsetToMap(`0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.-:+=^!/*?&<>()[]{}@%$#`)
 const pow2 = 7225
 const pow3 = 614125
@@ -52,5 +50,5 @@ export default function decodeBinary(base85) {
     ints[i * 4 + j] = lastPart[j]
   }
 
-  return gunzipSync(ints)
+  return ints
 }

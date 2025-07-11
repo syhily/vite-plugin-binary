@@ -1,4 +1,4 @@
-import { gzipSync } from 'fflate'
+import { gzipSync } from 'node:zlib'
 
 const z85: Uint8Array = charsetToMap(`0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.-:+=^!/*?&<>()[]{}@%$#`)
 
