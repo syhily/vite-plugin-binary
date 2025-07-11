@@ -58,7 +58,7 @@ export default function decodeBinary(base85) {
 }
 `
 
-export default function vitePluginBinary(): PluginOption {
+export default function vitePluginBinary(args: { gzip: boolean } | undefined): PluginOption {
   return {
     name: 'vite-plugin-binary',
     resolveId(id) {
@@ -79,7 +79,7 @@ export default function vitePluginBinary(): PluginOption {
         this.addWatchFile(file)
 
         const buffer = await promises.readFile(file)
-        const b64 = encodeBinary(buffer)
+        const b64 = encodeBinary(buffer, args === undefined || args.gzip)
 
         return {
           code: `import decodeBinary from 'virtual:decode-binary'\nexport default decodeBinary("${b64}")`,

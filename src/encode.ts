@@ -10,8 +10,10 @@ function charsetToMap(charset: string): Uint8Array {
   return ui8a
 }
 
-export default function encodeBinary(ui8a: Uint8Array): string {
-  ui8a = gzipSync(ui8a)
+export default function encodeBinary(ui8a: Uint8Array, gzip: boolean): string {
+  if (gzip) {
+    ui8a = gzipSync(ui8a)
+  }
 
   const remain = ui8a.length % 4
   const last5Length = remain ? remain + 1 : 0
