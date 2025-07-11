@@ -1,0 +1,63 @@
+{
+  "name": "vite-plugin-binary",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Vite plugin for importing file in Uint8Array format",
+  "author": "Yufan Sheng <syhily@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/syhily/vite-plugin-binary#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/syhily/vite-plugin-binary.git"
+  },
+  "bugs": {
+    "url": "https://github.com/syhily/vite-plugin-binary/issues"
+  },
+  "keywords": [
+    "Vite",
+    "base85",
+    "fflate"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/main.d.ts",
+      "import": "./dist/main.js",
+      "require": "./dist/main.cjs"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts"
+    }
+  },
+  "main": "./dist/main.js",
+  "module": "./dist/main.js",
+  "types": "./dist/main.d.ts",
+  "typesVersions": {
+    "*": {
+      "types": [
+        "dist/types.d.ts"
+      ]
+    }
+  },
+  "files": [
+    "dist",
+    "index.d.ts"
+  ],
+  "scripts": {
+    "build": "tsup && cp src/types.d.ts dist/",
+    "dev": "vite",
+    "lint": "eslint",
+    "lint:fix": "eslint --fix"
+  },
+  "dependencies": {
+    "fflate": "^0.8.2"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^4.16.2",
+    "@types/node": "^24.0.13",
+    "buffer": "^6.0.3",
+    "eslint": "^9.30.1",
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.3",
+    "vite": "^7.0.4"
+  }
+}
