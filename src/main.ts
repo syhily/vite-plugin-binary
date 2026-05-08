@@ -76,8 +76,6 @@ export default function vitePluginBinary(args: { gzip: boolean } | undefined): P
     async transform(_src, id) {
       if (id.endsWith('?binary')) {
         const file = id.slice(0, -7)
-        this.addWatchFile(file)
-
         const buffer = await promises.readFile(file)
         const b64 = encodeBinary(buffer, args === undefined || args.gzip)
 

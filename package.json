@@ -1,7 +1,7 @@
 {
   "name": "vite-plugin-binary",
   "type": "module",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "description": "Vite plugin for importing file in Uint8Array format",
   "author": "Yufan Sheng <syhily@gmail.com>",
   "license": "MIT",
@@ -43,18 +43,17 @@
     "index.d.ts"
   ],
   "scripts": {
-    "build": "tsup-node && cp src/types.d.ts dist/",
+    "build": "tsdown && cp src/types.d.ts dist/",
     "dev": "vite",
     "lint": "eslint",
     "lint:fix": "eslint --fix"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^4.18.0",
-    "@types/node": "^24.1.0",
-    "eslint": "^9.31.0",
+    "@types/node": "^25.6.2",
     "fflate": "^0.8.2",
-    "tsup": "^8.5.0",
-    "typescript": "^5.8.3",
-    "vite": "^7.0.5"
+    "tsdown": "^0.22.0",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.11"
   }
 }
