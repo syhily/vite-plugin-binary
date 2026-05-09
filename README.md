@@ -26,6 +26,21 @@ export default defineConfig({
 import compressed from './opposans.ttf?binary'
 ```
 
+The imported file is inlined into the generated JavaScript. By default, the plugin still emits the original asset during build.
+
+### Exclude Original File from Build Output
+
+If you want to keep the binary content in the generated JavaScript but remove the original file from the final assets output, enable `excludeAsset` in `vite.config.ts`.
+
+```ts
+import { defineConfig } from 'vite'
+import Binary from 'vite-plugin-binary'
+
+export default defineConfig({
+  plugins: [Binary({ excludeAsset: true })],
+})
+```
+
 ### Reduce Binary Size
 
 This plugin will compress the imported file in gzip format by default. This will slightly reduce the final js file size.

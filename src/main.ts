@@ -2,6 +2,11 @@ import type { PluginOption } from 'vite'
 import { promises } from 'node:fs'
 import encodeBinary from './encode'
 
+export interface VitePluginBinaryOptions {
+  gzip?: boolean
+  excludeAsset?: boolean
+}
+
 const decodeBinaryRaw = `const z85 = charsetToMap('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.-:+=^!/*?&<>()[]{}@%$#')
 const pow2 = 7225
 const pow3 = 614125
@@ -58,7 +63,9 @@ export default function decodeBinary(base85) {
 }
 `
 
-export default function vitePluginBinary(args: { gzip: boolean } | undefined): PluginOption {
+export default function vitePluginBinary(args: VitePluginBinaryOptions = {}): PluginOption {
+  const excludedAssetFileNames = new Set<string>()
+
   return {
     name: 'vite-plugin-binary',
     resolveId(id) {
@@ -74,10 +81,25 @@ export default function vitePluginBinary(args: { gzip: boolean } | undefined): P
       return null
     },
     async transform(_src, id) {
-      if (id.endsWith('?binary')) {
-        const file = id.slice(0, -7)
+      if (id.trim().endsWith('?binary')) {
+        const file = id.trim().slice(0, -7)
         const buffer = await promises.readFile(file)
-        const b64 = encodeBinary(buffer, args === undefined || args.gzip)
+        const b64 = encodeBinary(buffer, args.gzip ?? true)
+
+        // Ensure the file change will trigger a re-build
+        this.addWatchFile(file)
+
+        // Emit the original file as an asset by default.
+        this.emitFile({
+          type: 'asset',
+          fileName: file,
+          source: buffer,
+        })
+
+        // Exclude the original file from the final assets output.
+        if (args.excludeAsset) {
+          excludedAssetFileNames.add(file)
+        }
 
         return {
           code: `import decodeBinary from 'virtual:decode-binary'\nexport default decodeBinary("${b64}")`,
@@ -85,6 +107,11 @@ export default function vitePluginBinary(args: { gzip: boolean } | undefined): P
         }
       }
       return null
+    },
+    generateBundle(_, bundle) {
+      for (const fileName of excludedAssetFileNames) {
+        delete bundle[fileName]
+      }
     },
   }
 }
