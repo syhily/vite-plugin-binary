@@ -1,5 +1,6 @@
-import type { PluginOption } from 'vite'
+import { type PluginOption, perEnvironmentState } from 'vite'
 import { promises } from 'node:fs'
+import path from 'node:path'
 import encodeBinary from './encode'
 
 export interface VitePluginBinaryOptions {
@@ -64,10 +65,19 @@ export default function decodeBinary(base85) {
 `
 
 export default function vitePluginBinary(args: VitePluginBinaryOptions = {}): PluginOption {
-  const excludedAssetFileNames = new Set<string>()
+  let root = process.cwd()
+  const state = perEnvironmentState<{ excludedAssetFileNames: Set<string> }>(() => ({ excludedAssetFileNames: new Set() }))
+
+  const toAssetFileName = (file: string) => {
+    const relativeFile = path.relative(root, file)
+    return relativeFile.split(path.sep).join('/')
+  }
 
   return {
     name: 'vite-plugin-binary',
+    configResolved(config) {
+      root = config.root
+    },
     resolveId(id) {
       if (id === 'virtual:decode-binary') {
         return id
@@ -82,23 +92,18 @@ export default function vitePluginBinary(args: VitePluginBinaryOptions = {}): Pl
     },
     async transform(_src, id) {
       if (id.trim().endsWith('?binary')) {
-        const file = id.trim().slice(0, -7)
-        const buffer = await promises.readFile(file)
+        const filePath = id.trim().slice(0, -7)
+        const buffer = await promises.readFile(filePath)
         const b64 = encodeBinary(buffer, args.gzip ?? true)
 
-        // Ensure the file change will trigger a re-build
-        this.addWatchFile(file)
+        const assetFileName = toAssetFileName(filePath)
 
-        // Emit the original file as an asset by default.
-        this.emitFile({
-          type: 'asset',
-          fileName: file,
-          source: buffer,
-        })
+        // Ensure the file change will trigger a re-build
+        this.addWatchFile(filePath)
 
         // Exclude the original file from the final assets output.
         if (args.excludeAsset) {
-          excludedAssetFileNames.add(file)
+          state(this).excludedAssetFileNames.add(assetFileName)
         }
 
         return {
@@ -109,8 +114,18 @@ export default function vitePluginBinary(args: VitePluginBinaryOptions = {}): Pl
       return null
     },
     generateBundle(_, bundle) {
-      for (const fileName of excludedAssetFileNames) {
-        delete bundle[fileName]
+      const excludedAssetFileNames = state(this).excludedAssetFileNames
+
+      console.log('generateBundle', bundle)
+      console.log('excludedAssetFileNames', excludedAssetFileNames)
+
+      for (const fileName in bundle) {
+        const asset = bundle[fileName]
+        if (asset.type === 'asset') {
+          if (asset.originalFileNames.filter(name => excludedAssetFileNames.has(name)).length > 0) {
+            delete bundle[fileName]
+          }
+        }
       }
     },
   }
